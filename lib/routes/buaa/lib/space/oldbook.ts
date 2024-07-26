@@ -4,8 +4,6 @@ import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
 import timezone from '@/utils/timezone';
 import cache from '@/utils/cache';
-import { art } from '@/utils/render';
-import path from 'path';
 
 interface Book {
     bibId: string;
@@ -64,11 +62,11 @@ interface Info {
 }
 
 export const route: Route = {
-    path: String.raw`/lib/space/:path{newbook.*}`,
+    path: String.raw`/lib/space/:path{oldbook.*}`,
     name: '图书馆 - 新书速递',
     url: 'https://space.lib.buaa.edu.cn/mspace/newBook',
     maintainers: ['OverflowCat'],
-    example: '/buaa/lib/space/newbook/',
+    example: '/buaa/lib/space/oldbook/',
     handler,
     description: `可通过参数进行筛选：\`/buaa/lib/space/newbook/key1=value1&key2=value2...\`
 
@@ -144,13 +142,45 @@ async function handler(ctx: Context): Promise<Data> {
 
 async function getItem(item: Book): Promise<DataItem> {
     const info = await getItemInfo(item.isbn);
-    const holdings = JSON.parse(item.holdings) as Holding[];
+    const holdings = (JSON.parse(item.holdings) as Holding[])
+        .map(
+            (holding) => `
+<tr><th>所属馆藏地</th><td>${holding.location}</td></tr>
+<tr><th>索书号</th><td>${holding.callNo}</td></tr>
+<tr><th>条码号</th><td>${holding.barCode}</td></tr>
+<tr><th>编号</th><td>${holding.itemId}</td></tr>
+<tr><th>书刊状态</th><td style="color: ${holding.status === '可借' ? '#458f57' : '#d86d02'}">${holding.status}</td></tr>`
+        )
+        .join('');
     const link = `https://space.lib.buaa.edu.cn/space/searchDetailLocal/${item.bibId}`;
-    const content = art(path.join(__dirname, 'templates/newbook.art'), {
-        item,
-        info,
-        holdings,
-    });
+    const content = `
+<h1 itemprop="title">
+<a href="${link}" style="color: #006fcc;">${item.title}</a>
+</h1>
+${info?.imageUrl ? `<aside><img src="${info?.imageUrl}" alt="封面"></aside>` : ''}
+<h2>书籍信息</h2>
+<div><span class="call-no" style="font-family: JetBrainsMono, monospace; font-style: italic; font-weight: 700; color: #458f57;">${item.callno?.at(0) || '无'}</span> / <span class="author">${item.author}</span> / <span class="publisher">${item.publisher}</span> / <span class="pub-year">${item.pub_year}</span></div>
+<h3>简介</h3>
+<div itemprop="description">${info?.content}</div>
+<table>
+    <tr><th>ISBN</th><td itemprop="isbn">${item.isbn}</td></tr>
+    <tr><th>语言</th><td itemprop="language">${item.language}</td></tr>
+    <tr><th>类型</th><td itemprop="docType">${item.docTypeDesc}</td></tr>
+</table>
+<h3>作者简介</h3>
+<div itemprop="authorInfo">${info?.authorInfo}</div>
+<h2>馆藏信息</h2>
+${
+    item.onSelfDate
+        ? `<strong>上架时间</strong>：
+    <date datetime="${item.onSelfDate}">${item.onSelfDate}</date>`
+        : ''
+}
+<br>
+<h3>馆藏地点</h3>
+<table>${holdings}</table>
+${info?.catalog ? `<h2>目录</h2><div itemprop="catalog">${info?.catalog}</div>` : ''}
+`;
     return {
         language: item.language === 'eng' ? 'en' : 'zh-CN',
         title: item.title,
