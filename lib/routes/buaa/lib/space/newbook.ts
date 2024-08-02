@@ -71,35 +71,34 @@ export const route: Route = {
     example: '/buaa/lib/space/newbook/',
     handler,
     description: `可通过参数进行筛选：\`/buaa/lib/space/newbook/key1=value1&key2=value2...\`
+- \`dcpCode\`：学科分类代码
+  - 例：
+    - 工学：\`08\`
+    - 工学 > 计算机 > 计算机科学与技术：\`080901\`
+  - 默认值：\`nolimit\`
+  - 注意事项：不可与 \`clsNo\` 同时使用。
+- \`clsNo\`：中图分类号
+  - 例：
+    - 计算机科学：\`TP3\`
+  - 默认值：无
+  - 注意事项
+    - 不可与 \`dcpCode\` 同时使用。
+    - 此模式下获取不到上架日期。
+- \`libCode\`：图书馆代码
+  - 例：
+    - 本馆：\`00000\`
+  - 默认值：无
+  - 注意事项：只有本馆一个可选值。
+- \`locaCode\`：馆藏地代码
+  - 例：
+    - 五层西-中文新书借阅室(A-Z类)：\`02503\`
+  - 默认值：无
+  - 注意事项：必须与 \`libCode\` 同时使用。
 
-    - \`dcpCode\`：学科分类代码
-        - 例：
-            - 工学：\`08\`
-            - 工学 > 计算机 > 计算机科学与技术：\`080901\`
-        - 默认值：\`nolimit\`
-        - 注意事项：不可与 \`clsNo\` 同时使用。
-    - \`clsNo\`：中图分类号
-        - 例：
-            - 计算机科学：\`TP3\`
-        - 默认值：无
-        - 注意事项
-            - 不可与 \`dcpCode\` 同时使用。
-            - 此模式下获取不到上架日期。
-    - \`libCode\`：图书馆代码
-        - 例：
-            - 本馆：\`00000\`
-        - 默认值：无
-        - 注意事项：只有本馆一个可选值。
-    - \`locaCode\`：馆藏地代码
-        - 例：
-            - 五层西-中文新书借阅室(A-Z类)：\`02503\`
-        - 默认值：无
-        - 注意事项：必须与 \`libCode\` 同时使用。
-
-    例：
-        - \`buaa/lib/space/newbook\` 为所有新书
-        - \`buaa/lib/space/newbook/clsNo=U&libCode=00000&locaCode=60001\` 为沙河教2图书馆所有中图分类号为 U（交通运输）的书籍
-    `,
+示例：
+- \`buaa/lib/space/newbook\` 为所有新书
+- \`buaa/lib/space/newbook/clsNo=U&libCode=00000&locaCode=60001\` 为沙河教2图书馆所有中图分类号为 U（交通运输）的书籍
+`,
     categories: ['university'],
 
     features: {
