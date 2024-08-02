@@ -66,7 +66,7 @@ interface Info {
 export const route: Route = {
     path: String.raw`/lib/space/:path{newbook.*}`,
     name: '图书馆 - 新书速递',
-    url: 'https://space.lib.buaa.edu.cn/mspace/newBook',
+    url: 'space.lib.buaa.edu.cn/mspace/newBook',
     maintainers: ['OverflowCat'],
     example: '/buaa/lib/space/newbook/',
     handler,
@@ -130,8 +130,9 @@ async function handler(ctx: Context): Promise<Data> {
     const list = (data?.data?.dataList || []) as Book[];
     const item = await Promise.all(list.map(async (item: Book) => await getItem(item)));
     const res: Data = {
-        title: '图书馆 - 新书速递',
+        title: '北航图书馆 - 新书速递',
         item,
+        description: '北京航空航天大学图书馆新书速递',
         language: 'zh-CN',
         link: 'https://space.lib.buaa.edu.cn/space/newBook',
         author: '北京航空航天大学图书馆',
